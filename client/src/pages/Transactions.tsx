@@ -1,96 +1,81 @@
-import { FC } from "react";
-import TransactionForm from "../components/Transactions/TransactionForm.tsx";
-import { instance } from "../api/axios.api";
-import {
-  Category,
-  ResponseTransactionLoader,
-  Transaction,
-} from "../types/types";
+import { FC, useEffect, useState } from "react";
+import TransactionForm from "../components/Transactions/TransactionForm";
+import TransactionTable from "../components/Transactions/TransactionTable";
+import TotalDisplay from "../components/Transactions/TotalDisplay";
+import { Category, Transaction } from "../types/types";
 import { toast } from "react-toastify";
-import TransactionTable from "../components/Transactions/TransactionTable.tsx";
-import { useLoaderData } from "react-router-dom";
-import { formatCurrency } from "../helpers/currency.helper";
-import Chart from "../components/Transactions/Chart.tsx";
-
-export const TransactionLoader = async () => {
-  const categories = await instance.get<Category[]>("/categories");
-  const transactions = await instance.get<Transaction[]>("/transactions");
-  const totalIncome = await instance.get<number>("/transactions/income/find");
-  const totalExpense = await instance.get<number>("/transactions/expense/find");
-  console.log(totalIncome, totalExpense);
-
-  const data = {
-    categories: categories.data,
-    transactions: transactions.data,
-    totalIncome: totalIncome.data,
-    totalExpense: totalExpense.data,
-  };
-
-  return data;
-};
-
-export const TransactionAction = async ({ request }: any) => {
-  switch (request.method) {
-    case "POST": {
-      const formData = await request.formData();
-      const newTransaction = {
-        title: formData.get("title"),
-        amount: +formData.get("amount"),
-        category: formData.get("category"),
-        type: formData.get("type"),
-      };
-      await instance.post("/transactions", newTransaction);
-      toast.success("Transaction added successfully");
-      return null;
-    }
-    case "DELETE": {
-      const formData = await request.formData();
-      const transactionId = formData.get("id");
-      await instance.delete(`/transactions/transaction/${transactionId}`);
-      toast.success("Deleted successfully");
-      return null;
-    }
-  }
-};
+import {
+  getAllTransactions,
+  addTransaction,
+  deleteTransaction,
+  getTotalExpense,
+  getTotalIncome,
+} from "../services/transaction.service";
+import { getCategories } from "../services/category.service";
 
 const Transactions: FC = () => {
-  const { totalExpense, totalIncome } =
-    useLoaderData() as ResponseTransactionLoader;
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [totalIncome, setTotalIncome] = useState<number>(0);
+  const [totalExpense, setTotalExpense] = useState<number>(0);
+
+  const fetchAllData = async () => {
+    try {
+      const [catRes, transRes, incomeRes, expenseRes] = await Promise.all([
+        getCategories(),
+        getAllTransactions(),
+        getTotalIncome(),
+        getTotalExpense(),
+      ]);
+
+      setCategories(catRes.data);
+      setTransactions(transRes.data);
+      setTotalIncome(incomeRes.data);
+      setTotalExpense(expenseRes.data);
+    } catch (error) {
+      toast.error("Failed to load data");
+    }
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const handleAddTransaction = async (
+    newTransaction: Omit<Transaction, "id" | "created_at" | "updated_at">
+  ) => {
+    try {
+      await addTransaction(newTransaction);
+      toast.success("Transaction added successfully");
+      fetchAllData();
+    } catch (error) {
+      toast.error("Failed to add transaction");
+    }
+  };
+
+  const handleDeleteTransaction = async (id: number | string) => {
+    try {
+      await deleteTransaction(id);
+      toast.success("Transaction deleted successfully");
+      fetchAllData();
+    } catch (error) {
+      toast.error("Failed to delete transaction");
+    }
+  };
+
   return (
-    <>
+    <div>
       <div className="grid grid-cols-3 gap-4 mt-4 items-start">
         <div className="grid col-span-2">
-          <TransactionForm />
+          <TransactionForm categories={categories} onAdd={handleAddTransaction} />
         </div>
-        <div className="rounded-md bg-slate-800 p-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="uppercase text-md font-bold text-center">
-                Total Income:
-              </p>
-              <p className="bg-green-600 p-1 rounded-sm text-center mt-2">
-                {formatCurrency.format(totalIncome)}
-              </p>
-            </div>
-            <div>
-              <p className="uppercase text-md font-bold text-center">
-                Total Expense:
-              </p>
-              <p className="bg-red-600 p-1 rounded-sm text-center mt-2">
-                {formatCurrency.format(totalExpense)}
-              </p>
-            </div>
-          </div>
-          <>
-            <Chart totalExpense={totalExpense} totalIncome={totalIncome} />
-          </>
-        </div>
+        <TotalDisplay totalIncome={totalIncome} totalExpense={totalExpense} />
       </div>
 
       <h1 className="my-5">
-        <TransactionTable limit={5} />
+        <TransactionTable transactions={transactions} onDelete={handleDeleteTransaction} limit={5} />
       </h1>
-    </>
+    </div>
   );
 };
 

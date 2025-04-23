@@ -1,19 +1,19 @@
 import { FC, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
-import { Form, useLoaderData } from "react-router-dom";
-import { ResponseTransactionLoader, Transaction } from "../../types/types.ts";
+import { Transaction } from "../../types/types.ts";
 import { formatDate } from "../../helpers/date.helper.ts";
 import { formatCurrency } from "../../helpers/currency.helper.ts";
 import { instance } from "../../api/axios.api.ts";
 import ReactPaginate from "react-paginate";
+import { toast } from "react-toastify";
 
 interface ITransactionTable {
+  transactions: Transaction[];
+  onDelete: (id : number | string) => void;
   limit: number;
 }
 
-const TransactionTable: FC<ITransactionTable> = ({ limit = 3 }) => {
-  const { transactions } = useLoaderData() as ResponseTransactionLoader;
-
+const TransactionTable: FC<ITransactionTable> = ({ transactions, onDelete, limit = 3 }) => {
   const [data, setData] = useState<Transaction[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -28,6 +28,16 @@ const TransactionTable: FC<ITransactionTable> = ({ limit = 3 }) => {
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected + 1);
+  };
+
+  const handleDelete = async (id: number | string) => {
+    try {
+      await onDelete(id);
+      toast.success("Transaction deleted");
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      toast.error("Failed to delete transaction");
+    }
   };
 
   useEffect(() => {
@@ -80,12 +90,16 @@ const TransactionTable: FC<ITransactionTable> = ({ limit = 3 }) => {
                 <td>{transaction.category?.title || "Other"}</td>
                 <td>{formatDate(transaction.created_at)}</td>
                 <td>
-                  <Form method="DELETE" action="/transactions">
                     <input type="hidden" name="id" value={transaction.id} />
-                    <button className="btn hover:btn-red ml-auto">
+                    <button
+                      className="btn hover:btn-red ml-auto"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(transaction.id);
+                      }}
+                    >
                       <FaTrash />
                     </button>
-                  </Form>
                 </td>
               </tr>
             ))}
