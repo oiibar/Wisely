@@ -76,7 +76,7 @@ Technologies used in the project:
 
 <p>Here are some previews: </p>
 
-<img src="./wisely.png" alt="Screenshot">
+<img src="previews/wisely.png" alt="Screenshot">
 
 <h2>💖Like my work?</h2>
 

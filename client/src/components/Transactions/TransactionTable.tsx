@@ -1,48 +1,32 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { FaTrash } from "react-icons/fa";
-import { Transaction } from "../../types/types.ts";
-import { formatDate } from "../../helpers/date.helper.ts";
-import { formatCurrency } from "../../helpers/currency.helper.ts";
-import { instance } from "../../api/axios.api.ts";
+import { Transaction } from "../../types/types";
+import { formatDate } from "../../helpers/date.helper";
+import { formatCurrency } from "../../helpers/currency.helper";
 import ReactPaginate from "react-paginate";
-import { toast } from "react-toastify";
+import { usePaginatedTransactions } from "../../hooks/usePaginatedTransactions";
 
 interface ITransactionTable {
   transactions: Transaction[];
-  onDelete: (id : number | string) => void;
+  onDelete: (id: number) => void;
   limit: number;
 }
 
 const TransactionTable: FC<ITransactionTable> = ({ transactions, onDelete, limit = 3 }) => {
-  const [data, setData] = useState<Transaction[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-
-  const fetchTransactions = async (page: number) => {
-    const response = await instance.get(
-      `/transactions/pagination?page=${page}&limit=${limit}`
-    );
-    setData(response.data);
-    setTotalPages(Math.ceil(transactions.length / limit));
-  };
+  const {
+    data,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+  } = usePaginatedTransactions(limit, transactions.length);
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected + 1);
   };
 
-  const handleDelete = async (id: number | string) => {
-    try {
-      await onDelete(id);
-      toast.success("Transaction deleted");
-    } catch (error) {
-      console.error("Error deleting transaction:", error);
-      toast.error("Failed to delete transaction");
-    }
+  const handleDelete = async (id: number) => {
+    await onDelete(id);
   };
-
-  useEffect(() => {
-    fetchTransactions(currentPage);
-  }, [currentPage, transactions]);
 
   return (
     <>
@@ -58,51 +42,46 @@ const TransactionTable: FC<ITransactionTable> = ({ transactions, onDelete, limit
         pageRangeDisplayed={1}
         marginPagesDisplayed={2}
         onPageChange={handlePageChange}
+        forcePage={currentPage - 1}
       />
+
       <div className="bg-slate-800 px-4 py-3 mt-4 rounded-md">
         <table className="w-full">
           <thead>
-            <tr>
-              <td className="font-bold">№</td>
-              <td className="font-bold">Title</td>
-              <td className="font-bold">Amount</td>
-              <td className="font-bold">Category</td>
-              <td className="font-bold">Date</td>
-              <td className="text-right">Action</td>
-            </tr>
+          <tr>
+            <td className="font-bold">№</td>
+            <td className="font-bold">Title</td>
+            <td className="font-bold">Amount</td>
+            <td className="font-bold">Category</td>
+            <td className="font-bold">Date</td>
+            <td className="text-right">Action</td>
+          </tr>
           </thead>
           <tbody>
-            {data.map((transaction, id) => (
-              <tr key={id}>
-                <td>{id + 1}</td>
-                <td>{transaction.title}</td>
-                <td
-                  className={
-                    transaction.type == "income"
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }
+          {data.map((transaction, index) => (
+            <tr key={transaction.id}>
+              <td>{index + 1 + (currentPage - 1) * limit}</td>
+              <td>{transaction.title}</td>
+              <td className={transaction.type === "income" ? "text-green-500" : "text-red-500"}>
+                {transaction.type === "income"
+                  ? `+  ${formatCurrency.format(transaction.amount)}`
+                  : `-  ${formatCurrency.format(transaction.amount)}`}
+              </td>
+              <td>{transaction.category?.title || "Other"}</td>
+              <td>{formatDate(transaction.created_at)}</td>
+              <td>
+                <button
+                  className="btn hover:btn-red ml-auto"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(transaction.id);
+                  }}
                 >
-                  {transaction.type == "income"
-                    ? `+  ${formatCurrency.format(transaction.amount)}`
-                    : `-  ${formatCurrency.format(transaction.amount)}`}
-                </td>
-                <td>{transaction.category?.title || "Other"}</td>
-                <td>{formatDate(transaction.created_at)}</td>
-                <td>
-                    <input type="hidden" name="id" value={transaction.id} />
-                    <button
-                      className="btn hover:btn-red ml-auto"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(transaction.id);
-                      }}
-                    >
-                      <FaTrash />
-                    </button>
-                </td>
-              </tr>
-            ))}
+                  <FaTrash />
+                </button>
+              </td>
+            </tr>
+          ))}
           </tbody>
         </table>
       </div>

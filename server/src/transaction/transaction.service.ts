@@ -21,7 +21,7 @@ export class TransactionService {
       title: createTransactionDto.title,
       amount: createTransactionDto.amount,
       type: createTransactionDto.type,
-      category: { id: +createTransactionDto.category },
+      category: { id: +createTransactionDto.category.id },
       user: { id },
     };
 
@@ -33,7 +33,7 @@ export class TransactionService {
   }
 
   async findAll(id: number) {
-    const transactions = await this.transactionRepository.find({
+    return await this.transactionRepository.find({
       where: {
         user: {
           id,
@@ -46,7 +46,6 @@ export class TransactionService {
         created_at: 'DESC',
       },
     });
-    return transactions;
   }
 
   async findOne(id: number) {
@@ -93,6 +92,9 @@ export class TransactionService {
     const transactions = await this.transactionRepository.find({
       where: {
         user: { id },
+      },
+      relations: {
+        category: true,
       },
       order: {
         created_at: 'DESC',

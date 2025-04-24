@@ -8,3 +8,5 @@ async function bootstrap() {
   await app.listen(10000, '0.0.0.0');
 }
 bootstrap();
+
+// "start:dev": "kill-port.cmd && nest start --watch",

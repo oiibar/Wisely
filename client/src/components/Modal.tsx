@@ -69,7 +69,6 @@ const Modal: FC<IModal> = ({ type, id, setVisibleModal, fetchCategories }) => {
               <input
                 className="input w-full"
                 type="text"
-                placeholder="Enter category title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />

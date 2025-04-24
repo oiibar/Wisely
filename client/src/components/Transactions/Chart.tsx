@@ -11,7 +11,7 @@ interface Data {
   name: string;
 }
 
-const COLORS = ["#00C49F", "#FF8042"];
+const COLORS = ["#FF8042", "#00C49F"];
 
 const Chart: FC<Chart> = ({ totalIncome, totalExpense }) => {
   const data = new Array<Data>(

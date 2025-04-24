@@ -1,7 +1,6 @@
 import { FC, useState } from "react";
-import { FaPlus } from "react-icons/fa";
-import Modal from "../Modal";
 import { Category, Transaction } from "../../types/types";
+import { toast } from "react-toastify";
 
 interface Props {
   categories: Category[];
@@ -9,29 +8,48 @@ interface Props {
 }
 
 const TransactionForm: FC<Props> = ({ categories, onAdd }) => {
-  const [visible, setVisible] = useState(false);
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [categoryId, setCategoryId] = useState("");
-  const [type, setType] = useState("income");
+  const [formData, setFormData] = useState({
+    title: "",
+    amount: '',
+    categoryId: "",
+    type: "income",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "amount" ? value : value,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const selectedCategory = categories.find((cat) => cat.id.toString() === categoryId);
-    if (!title || !amount || !selectedCategory || !type) return;
+    const selectedCategory = categories.find(
+      (cat) => cat.id.toString() === formData.categoryId
+    );
+
+    if (!formData.title || !formData.amount || !selectedCategory) {
+      toast.error("Please fill out all fields");
+      return;
+    }
 
     await onAdd({
-      title,
-      amount,
+      title: formData.title,
+      amount: parseFloat(formData.amount),
       category: selectedCategory,
-      type,
+      type: formData.type,
     });
 
-    setTitle("");
-    setAmount(0);
-    setCategoryId("");
-    setType("income");
+    setFormData({
+      title: "",
+      amount: "",
+      categoryId: "",
+      type: "income",
+    });
   };
 
   return (
@@ -40,67 +58,64 @@ const TransactionForm: FC<Props> = ({ categories, onAdd }) => {
         <label className="grid" htmlFor="title">
           <span>Title</span>
           <input
+            id="title"
+            name="title"
             type="text"
             className="input"
-            placeholder="Title"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={formData.title}
+            onChange={handleChange}
             required
           />
         </label>
         <label className="grid" htmlFor="amount">
           <span>Amount</span>
           <input
-            type="number"
-            className="input"
-            placeholder="Amount"
+            id="amount"
             name="amount"
-            value={amount}
-            onChange={(e) => setAmount(+e.target.value)}
+            type="number"
+            inputMode="decimal"
+            pattern="\d*"
+            className="input"
+            min={0}
+            value={formData.amount}
+            onChange={handleChange}
             required
           />
         </label>
 
         {categories.length ? (
-          <label htmlFor="category" className="grid">
+          <label htmlFor="categoryId" className="grid">
             <span>Category</span>
             <select
+              id="categoryId"
+              name="categoryId"
               className="input border-slate-700"
+              value={formData.categoryId}
+              onChange={handleChange}
               required
-              name="category"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
             >
-              <option value="" disabled>Select a category</option>
+              <option value="" disabled>
+                Select a category
+              </option>
               {categories.map((cat) => (
-                <option value={cat.id.toString()} key={cat.id}>
+                <option key={cat.id} value={cat.id.toString()}>
                   {cat.title}
                 </option>
               ))}
             </select>
           </label>
         ) : (
-          <h1 className="mt-1 text-red-300">Create categories first</h1>
+          <p className="mt-1 text-red-300">Create categories first</p>
         )}
 
-        <button
-          type="button"
-          onClick={() => setVisible(!visible)}
-          className="max-w-fit flex items-center gap-2 text-white/50 hover:text-white"
-        >
-          <FaPlus />
-          <span>Manage Categories</span>
-        </button>
-
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center mt-2">
           <label className="cursor-pointer flex items-center gap-2">
             <input
               type="radio"
               name="type"
               value="income"
-              checked={type === "income"}
-              onChange={() => setType("income")}
+              checked={formData.type === "income"}
+              onChange={handleChange}
               className="form-radio text-blue-600"
             />
             <span>Income</span>
@@ -110,20 +125,23 @@ const TransactionForm: FC<Props> = ({ categories, onAdd }) => {
               type="radio"
               name="type"
               value="expense"
-              checked={type === "expense"}
-              onChange={() => setType("expense")}
+              checked={formData.type === "expense"}
+              onChange={handleChange}
               className="form-radio text-blue-600"
             />
             <span>Expense</span>
           </label>
         </div>
 
-        <button type="submit" className="btn btn-green max-w-fit mt-2">
+        <button
+          type="submit"
+          className="btn btn-green max-w-fit mt-2"
+          disabled={!categories.length}
+        >
           Submit
         </button>
       </form>
 
-      {visible && <Modal type="post" setVisibleModal={setVisible} />}
     </div>
   );
 };
