@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
-import { AuthService } from "../services/auth.service";
+import { AuthService } from "@services/auth.service";
 import { toast } from "react-toastify";
-import { setToken } from "../helpers/localstorage.helper";
-import { useAppDispatch } from "../store/hooks";
-import { login } from "../store/user/userSlice";
+import { setToken } from "@helpers/localstorage.helper";
+import { useAppDispatch } from "@store/hooks";
+import { login } from "@store/user/userSlice";
 import { useNavigate } from "react-router-dom";
 
 const Auth: FC = () => {

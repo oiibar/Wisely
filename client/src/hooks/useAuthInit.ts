@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getToken, removeToken } from "../helpers/localstorage.helper";
-import { AuthService } from "../services/auth.service";
-import { useAppDispatch } from "../store/hooks";
-import { login, logout } from "../store/user/userSlice";
+import { getToken, removeToken } from "@helpers/localstorage.helper";
+import { AuthService } from "@services/auth.service";
+import { useAppDispatch } from "@store/hooks";
+import { login, logout } from "@store/user/userSlice";
 
 export const useAuthInit = () => {
   const dispatch = useAppDispatch();

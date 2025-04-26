@@ -1,6 +1,6 @@
 import { FC } from "react";
-import { Category } from "../../types/types.ts";
-import CategoryItem from "./CategoryItem.tsx";
+import { Category } from "@interfaces/category";
+import CategoryItem from "@components/Categories/CategoryItem";
 interface Props {
   categories: Category[];
   handleEditClick: (id: number) => void;

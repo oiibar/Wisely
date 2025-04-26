@@ -1,5 +1,5 @@
-import { instance } from "../api/axios.api";
-import { Category } from "../types/types";
+import { instance } from "@api/axios.api";
+import { Category } from "@interfaces/category";
 
 export const getCategories = () => instance.get<Category[]>("/categories");
 

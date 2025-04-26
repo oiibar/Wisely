@@ -1,6 +1,6 @@
 import React from "react";
-import { formatCurrency } from "../../helpers/currency.helper.ts";
-import Chart from "./Chart.tsx";
+import { formatCurrency } from "@helpers/currency.helper.ts";
+import Chart from "@components/Transactions/Chart.tsx";
 
 interface Props {
   totalIncome: number;

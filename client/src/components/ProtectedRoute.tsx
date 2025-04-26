@@ -1,6 +1,6 @@
 import { FC } from "react";
-import { useAuth } from "../hooks/useAuth";
-import err from "../assets/err.png";
+import { useAuth } from "@hooks/useAuth";
+import err from "@assets/err.png";
 
 interface Props {
   children: JSX.Element;

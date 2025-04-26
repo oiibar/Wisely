@@ -1,9 +1,9 @@
 import { FC } from "react";
 import { FaPlus } from "react-icons/fa";
-import { useCategories } from "../hooks/useCategories";
-import { useModal } from "../hooks/useModal";
-import CategoriesList from "../components/Categories/CategoriesList";
-import Modal from "../components/Modal";
+import { useCategories } from "@hooks/useCategories";
+import { useModal } from "@hooks/useModal";
+import CategoriesList from "@components/Categories/CategoriesList";
+import Modal from "@components/Modal";
 
 const Categories: FC = () => {
   const { categories, fetchCategories, removeCategory } = useCategories();

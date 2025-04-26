@@ -1,9 +1,9 @@
 import { FC } from "react";
-import TransactionForm from "../components/Transactions/TransactionForm";
-import TransactionTable from "../components/Transactions/TransactionTable";
-import TotalDisplay from "../components/Transactions/TotalDisplay";
-import { useCategories } from "../hooks/useCategories";
-import { useTransactions } from "../hooks/useTransactions";
+import TransactionForm from "@components/Transactions/TransactionForm";
+import TransactionTable from "@components/Transactions/TransactionTable";
+import TotalDisplay from "@components/Transactions/TotalDisplay";
+import { useCategories } from "@hooks/useCategories";
+import { useTransactions } from "@hooks/useTransactions";
 
 const Transactions: FC = () => {
   const { categories } = useCategories();

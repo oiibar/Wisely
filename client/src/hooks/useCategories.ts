@@ -1,37 +1,33 @@
-import { useEffect, useState } from "react";
-import { Category } from "../types/types";
-import { getCategories, deleteCategory } from "../services/category.service";
-import { toast } from "react-toastify";
+import { useCallback, useEffect, useState } from "react";
+import { Category } from "@interfaces/category";
+import { getCategories, deleteCategory } from "@services/category.service";
+import { useAsync } from "@hooks/useAsync";
 
 export const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchCategories = async () => {
+  const safeGetCategories = useAsync(getCategories);
+  const safeDeleteCategory = useAsync(deleteCategory);
+
+  const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await getCategories();
+      const { data } = await safeGetCategories();
       setCategories(data);
-    } catch {
-      toast.error("Failed to load categories");
     } finally {
       setLoading(false);
     }
-  };
+  }, [safeGetCategories]);
 
-  const removeCategory = async (id: number) => {
-    try {
-      await deleteCategory(id);
-      toast.success("Category deleted successfully");
-      fetchCategories();
-    } catch {
-      toast.error("Failed to delete category");
-    }
-  };
+  const removeCategory = useCallback(async (id: number) => {
+    await safeDeleteCategory(id);
+    setCategories(prev => prev.filter(cat => cat.id !== id));
+  }, [safeDeleteCategory]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return {
     categories,

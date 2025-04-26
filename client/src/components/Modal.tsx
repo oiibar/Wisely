@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { addCategory, updateCategory, getCategoryById } from "../services/category.service";
+import { addCategory, updateCategory, getCategoryById } from "@services/category.service";
 import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
 interface IModal {

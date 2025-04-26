@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { SiNintendogamecube } from "react-icons/si";
 import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth.ts";
+import { useAuth } from "@hooks/useAuth.ts";
 
 const Home: FC = () => {
   const isAuth = useAuth()

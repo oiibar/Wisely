@@ -21,21 +21,3 @@ export interface User {
   token: string;
   id: number;
 }
-
-export interface Category {
-  title: string;
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  transactions?: [];
-}
-
-export interface Transaction {
-  id: number;
-  amount: number;
-  title: string;
-  type: string;
-  category: Category;
-  created_at: string;
-  updated_at: string;
-}

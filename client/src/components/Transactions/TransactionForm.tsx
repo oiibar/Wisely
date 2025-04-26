@@ -1,5 +1,6 @@
 import { FC, useState } from "react";
-import { Category, Transaction } from "../../types/types";
+import { Transaction } from "@interfaces/transaction.ts";
+import { Category } from "@interfaces/category"
 import { toast } from "react-toastify";
 
 interface Props {

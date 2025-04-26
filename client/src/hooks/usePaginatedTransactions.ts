@@ -1,25 +1,20 @@
 import { useEffect, useState } from "react";
-import { instance } from "../api/axios.api";
-import { Transaction } from "../types/types";
+import { Transaction } from "@interfaces/transaction";
+import { getPaginatedTransactions } from "@services/transaction.service";
+import { useAsync } from "@hooks/useAsync";
 
 export function usePaginatedTransactions(limit: number, totalCount: number) {
   const [data, setData] = useState<Transaction[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await instance.get(
-          `/transactions/pagination?page=${currentPage}&limit=${limit}`
-        );
-        setData(response.data);
-        setTotalPages(Math.ceil(totalCount / limit));
-      } catch (error) {
-        console.error("Failed to fetch transactions:", error);
-      }
-    };
+  const fetchTransactions = useAsync(async () => {
+    const response = await getPaginatedTransactions(currentPage, limit);
+    setData(response.data);
+    setTotalPages(Math.ceil(totalCount / limit));
+  });
 
+  useEffect(() => {
     fetchTransactions();
   }, [currentPage, limit, totalCount]);
 

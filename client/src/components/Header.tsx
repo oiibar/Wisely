@@ -1,10 +1,10 @@
 import { FC } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
-import { useAuth } from "../hooks/useAuth";
-import { useAppDispatch } from "../store/hooks";
-import { logout } from "../store/user/userSlice";
-import { removeToken } from "../helpers/localstorage.helper";
+import { useAuth } from "@hooks/useAuth";
+import { useAppDispatch } from "@store/hooks";
+import { logout } from "@store/user/userSlice";
+import { removeToken } from "@helpers/localstorage.helper";
 import { toast } from "react-toastify";
 
 const Header: FC = () => {

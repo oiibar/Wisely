@@ -1,10 +1,10 @@
 import { FC } from "react";
 import { FaTrash } from "react-icons/fa";
-import { Transaction } from "../../types/types";
-import { formatDate } from "../../helpers/date.helper";
-import { formatCurrency } from "../../helpers/currency.helper";
+import { Transaction } from "@interfaces/transaction";
+import { formatDate } from "@helpers/date.helper";
+import { formatCurrency } from "@helpers/currency.helper";
 import ReactPaginate from "react-paginate";
-import { usePaginatedTransactions } from "../../hooks/usePaginatedTransactions";
+import { usePaginatedTransactions } from "@hooks/usePaginatedTransactions";
 
 interface ITransactionTable {
   transactions: Transaction[];

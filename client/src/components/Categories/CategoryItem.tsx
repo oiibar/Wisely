@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Category } from "../../types/types.ts";
+import { Category } from "@interfaces/category";
 import { AiFillCloseCircle, AiFillEdit } from "react-icons/ai";
 
 const CategoryItem: FC<{
