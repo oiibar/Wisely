@@ -20,7 +20,7 @@ import * as path from 'path';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      configService: ConfigService,
+      // configService: ConfigService,
       useFactory: () => ({
         type: 'postgres',
         // host: configService.get('DB_HOST'),
